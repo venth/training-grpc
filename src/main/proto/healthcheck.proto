@@ -1,0 +1,16 @@
+syntax = "proto3";
+option java_multiple_files = true;
+option java_package = "org.venth.training.grpc";
+option objc_class_prefix = "RTG";
+
+package grpc.monitoring;
+
+message EchoMessage {
+    string text = 1;
+}
+
+// Interface exported by the server.
+service HealthCheck {
+
+    rpc Echo(EchoMessage) returns (stream EchoMessage);
+}
