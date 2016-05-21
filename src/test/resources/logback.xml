@@ -11,6 +11,9 @@
         </encoder>
     </appender>
 
+    <logger name="io.grpc.netty.NettyServerHandler" level="ERROR" additivity="false" />
+    <logger name="io.grpc.netty.NettyClientHandler" level="ERROR" additivity="false" />
+
     <root level="debug">
         <appender-ref ref="STDOUT" />
     </root>
