@@ -1,7 +1,9 @@
 package org.venth.training;
 
 import io.grpc.stub.StreamObserver;
+import rx.Observable;
 import rx.internal.operators.UnicastSubject;
+import rx.schedulers.Schedulers;
 import rx.subjects.Subject;
 
 /**
@@ -9,24 +11,30 @@ import rx.subjects.Subject;
  */
 public class ObservableGrpcResponseStream<V> implements StreamObserver<V> {
 
-    public final Subject<V, V> observableResponse;
+    private Subject<V, V> responseStream;
+    public final Observable<V> observable;
+
+    public ObservableGrpcResponseStream(int bufferCapacity) {
+        this.responseStream = UnicastSubject.create(bufferCapacity);
+        observable = this.responseStream.subscribeOn(Schedulers.io());
+    }
 
     public ObservableGrpcResponseStream() {
-        this.observableResponse = UnicastSubject.create();
+        this(5);
     }
 
     @Override
     public void onCompleted() {
-        observableResponse.onCompleted();
+        responseStream.onCompleted();
     }
 
     @Override
     public void onError(Throwable e) {
-        observableResponse.onError(e);
+        responseStream.onError(e);
     }
 
     @Override
     public void onNext(V v) {
-        observableResponse.onNext(v);
+        responseStream.onNext(v);
     }
 }

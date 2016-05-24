@@ -89,5 +89,30 @@ I had couple of issues with proper configuration of this plugin. Issues:
     * option java_package = "org.venth.training.grpc.api";
     * option java_outer_classname = "HealthcheckProto";
     * option java_generic_services = false;
-4. never ending wait for response
-    //TODO describe along with test scenario example
+
+## Interesting behaviours
+1. never ending wait for a response
+
+    It happens when during launch of the server wrong protocol configuration is provided.
+    The example of never ending wait is provided in the test: _never ending wait for response because of wrong protocl settings_
+
+    The server's configuration:
+    ```
+    Server server = NettyServerBuilder.forPort(serverPort)
+                    .protocolNegotiator(ProtocolNegotiators.plaintext())
+                    .addService(HealthcheckGrpc.bindService(new Healthcheck()))
+                    .build();
+    ```
+
+    The spoiling part is: ****.protocolNegotiator(ProtocolNegotiators.plaintext())****
+    To correct the error jsut use: ****.protocolNegotiator(ProtocolNegotiators.serverPlaintext())****
+
+    The error is signalized by following log entry (level DEBUG):
+    ```
+    i.n.channel.DefaultChannelPipeline - Discarded inbound message
+    PooledUnsafeDirectByteBuf(ridx: 0, widx: 64, cap: 1024) that reached at the tail of the pipeline.
+    Please check your pipeline configuration.
+    ```
+
+    At first glace it tells nothing about configuration. After a while spent on digging in sources, I figured out that
+    the configuration is responsible.
