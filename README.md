@@ -109,10 +109,16 @@ I had couple of issues with proper configuration of this plugin. Issues:
 
     The error is signalized by following log entry (level DEBUG):
     ```
-    i.n.channel.DefaultChannelPipeline - Discarded inbound message
-    PooledUnsafeDirectByteBuf(ridx: 0, widx: 64, cap: 1024) that reached at the tail of the pipeline.
-    Please check your pipeline configuration.
+    i.n.channel.DefaultChannelPipeline - Discarded inbound message PooledUnsafeDirectByteBuf(ridx: 0, widx: 64, cap: 1024) that reached at the tail of the pipeline. Please check your pipeline configuration.
     ```
 
     At first glace it tells nothing about configuration. After a while spent on digging in sources, I figured out that
-    the configuration is responsible.
+    the server's configuration is responsible for the deadlock.
+
+    The corrected server configuration looks as follows:
+
+    ```
+        .protocolNegotiator(ProtocolNegotiators.serverPlaintext())
+    ```
+
+    As always, it seems that timeouts need to be provided.
